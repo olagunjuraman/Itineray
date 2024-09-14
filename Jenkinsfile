@@ -56,6 +56,12 @@ pipeline {
         }
 
         stage('Build Docker Image') {
+            agent {
+                docker {
+                    image 'python:3.9-slim'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
             steps {
                 script {
                     def fullImageName = "${GCR_REGION}.gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
