@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+     agent {
+        docker {
+            image 'python:3.9-slim'  // This image includes pip
+        }
+     }
 
     environment {
         GCP_PROJECT_ID = 'your-gcp-project-id'
