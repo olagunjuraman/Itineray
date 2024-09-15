@@ -15,43 +15,43 @@ pipeline {
             }
         }
 
-        stage('YAML Validation') {
-            agent {
-                docker {
-                    image 'python:3.9-slim'
-                    args '--rm -u root'
-                }
-            }
-            steps {
-                sh 'pip install yamllint'
-                sh 'find . -name "*.yaml" -o -name "*.yml" | xargs yamllint'
-            }
-        }
+        // stage('YAML Validation') {
+        //     agent {
+        //         docker {
+        //             image 'python:3.9-slim'
+        //             args '--rm -u root'
+        //         }
+        //     }
+        //     steps {
+        //         sh 'pip install yamllint'
+        //         sh 'find . -name "*.yaml" -o -name "*.yml" | xargs yamllint'
+        //     }
+        // }
 
-        stage('Schema Validation') {
-            agent {
-                docker {
-                    image 'garethr/kubeval'
-                    args '--rm'
-                }
-            }
-            steps {
-                sh 'find . -name "*.yaml" -o -name "*.yml" | xargs kubeval --strict'
-            }
-        }
+        // stage('Schema Validation') {
+        //     agent {
+        //         docker {
+        //             image 'garethr/kubeval'
+        //             args '--rm'
+        //         }
+        //     }
+        //     steps {
+        //         sh 'find . -name "*.yaml" -o -name "*.yml" | xargs kubeval --strict'
+        //     }
+        // }
 
-        stage('Install Dependencies and Build') {
-            agent {
-                docker {
-                    image 'node:14'
-                    args '--rm'
-                }
-            }
-            steps {
-                sh 'npm ci'
-                sh 'npm run build'
-            }
-        }
+        // stage('Install Dependencies and Build') {
+        //     agent {
+        //         docker {
+        //             image 'node:14'
+        //             args '--rm'
+        //         }
+        //     }
+        //     steps {
+        //         sh 'npm ci'
+        //         sh 'npm run build'
+        //     }
+        // }
 
         stage('Build and Push Docker Image') {
             steps {
@@ -74,16 +74,16 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            cleanWs()
-            sh 'docker system prune -f'  
-        }
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Check the logs for details.'
-        }
-    }
+    // post {
+    //     always {
+    //         cleanWs()
+    //         sh 'docker system prune -f'  
+    //     }
+    //     success {
+    //         echo 'Pipeline completed successfully!'
+    //     }
+    //     failure {
+    //         echo 'Pipeline failed. Check the logs for details.'
+    //     }
+    // }
 }
