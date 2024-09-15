@@ -159,20 +159,22 @@ pipeline {
         stage('Install Dependencies and Build') {
             agent {
                 docker {
-                    image 'node:14'  // Use a Node.js image for npm commands
+                    image 'node:14'  
                 }
             }
             steps {
-                sh 'npm ci'  // Use 'npm ci' for more reliable installs in CI environments
+                sh 'npm ci' 
                 sh 'npm run build'
             }
         }
 
         stage('Build and Push Docker Image') {
-     
+            agent{
             docker {
             image 'docker:dind'
             args '-v /var/run/docker.sock:/var/run/docker.sock'
+            }
+
             }
         
             steps {
