@@ -6,7 +6,7 @@ pipeline {
         GCR_REGION     = 'us' 
         IMAGE_NAME     = 'itinerary' 
         IMAGE_TAG      = "${env.BUILD_NUMBER}" 
-        GCP_KEY        = credentials('gcr-service-account-key')
+        GCP_KEY        = credentials('gcr-json-key')
     }
 
     stages {
