@@ -290,17 +290,17 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            cleanWs()
-            sh "gcloud auth revoke --all || true"
-            sh "docker rmi ${DOCKER_IMAGE} || true"
-        }
-        success {
-            echo "Successfully built, pushed, and set up ArgoCD deployment for: ${DOCKER_IMAGE}"
-        }
-        failure {
-            echo "Failed in build/push/ArgoCD setup of: ${DOCKER_IMAGE}"
-        }
-    }
+    // post {
+    //     always {
+    //         cleanWs()
+    //         sh "gcloud auth revoke --all || true"
+    //         sh "docker rmi ${DOCKER_IMAGE} || true"
+    //     }
+    //     success {
+    //         echo "Successfully built, pushed, and set up ArgoCD deployment for: ${DOCKER_IMAGE}"
+    //     }
+    //     failure {
+    //         echo "Failed in build/push/ArgoCD setup of: ${DOCKER_IMAGE}"
+    //     }
+    // }
 }
