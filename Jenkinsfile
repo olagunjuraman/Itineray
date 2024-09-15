@@ -23,7 +23,7 @@ pipeline {
                     withCredentials([file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE')]) {
                         sh "gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}"
                         sh "gcloud config set project ${GCP_PROJECT_ID}"
-                        sh "gcloud auth configure-docker ${GCR_REGION}.gcr.io -q"
+                        sh "gcloud auth configure-docker gcr.io -q"
 
                         sh "docker build -t ${fullImageName} ."
                         sh "docker push ${fullImageName}"
