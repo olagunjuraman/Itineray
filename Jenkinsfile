@@ -273,31 +273,31 @@ pipeline {
                         """
                         
                         // Create/Update Application
-                        sh """
-                            kubectl --token=${ARGOCD_AUTH_TOKEN} \
-                                --server=${ARGOCD_SERVER} \
-                                --insecure-skip-tls-verify \
-                                apply -f - <<EOF
-                            apiVersion: argoproj.io/v1alpha1
-                            kind: Application
-                            metadata:
-                              name: ${appName}
-                              namespace: argocd
-                            spec:
-                              project: default
-                              source:
-                                repoURL: ${repoUrl}
-                                targetRevision: HEAD
-                                path: k8s
-                              destination:
-                                server: https://kubernetes.default.svc
-                                namespace: ${K8S_NAMESPACE}
-                              syncPolicy:
-                                automated:
-                                  prune: true
-                                  selfHeal: true
-                            EOF
-                        """
+                        // sh """
+                        //     kubectl --token=${ARGOCD_AUTH_TOKEN} \
+                        //         --server=${ARGOCD_SERVER} \
+                        //         --insecure-skip-tls-verify \
+                        //         apply -f - <<EOF
+                        //     apiVersion: argoproj.io/v1alpha1
+                        //     kind: Application
+                        //     metadata:
+                        //       name: ${appName}
+                        //       namespace: argocd
+                        //     spec:
+                        //       project: default
+                        //       source:
+                        //         repoURL: ${repoUrl}
+                        //         targetRevision: HEAD
+                        //         path: k8s
+                        //       destination:
+                        //         server: https://kubernetes.default.svc
+                        //         namespace: ${K8S_NAMESPACE}
+                        //       syncPolicy:
+                        //         automated:
+                        //           prune: true
+                        //           selfHeal: true
+                        //     EOF
+                        // """
                     //}
                     
                     echo "ArgoCD Application URL: ${ARGOCD_SERVER}/applications/${appName}"
