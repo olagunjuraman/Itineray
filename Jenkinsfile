@@ -248,94 +248,39 @@ pipeline {
             }
         }
 
-        stage('Create ArgoCD Repository and Application') {
-            steps {
-                script {
-                    def repoUrl = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
-                    def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
-                    
-                    // withCredentials([string(credentialsId: 'argocd-api-key', variable: 'ARGOCD_AUTH_TOKEN')]) {
-                        // Create Repository
-                        // sh """
-                        //     kubectl --token=${ARGOCD_AUTH_TOKEN} \
-                        //         --server=${ARGOCD_SERVER} \
-                        //         --insecure-skip-tls-verify \
-                        //         apply -f - <<EOF
-                        //     apiVersion: argoproj.io/v1alpha1
-                        //     kind: Repository
-                        //     metadata:
-                        //       name: ${REPO_NAME}
-                        //       namespace: argocd
-                        //     spec:
-                        //       url: ${repoUrl}
-                        //       type: git
-                        //     EOF
-                        // """
+      stage('Create ArgoCD Repository and Application') {
+    steps {
+        script {
+            def repoUrl = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
+            def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
+            
+            sh """
+            sed -i 's|\\${REPO_NAME}|${REPO_NAME}|g; s|\\${REPO_URL}|${repoUrl}|g' argocd-repository-template.yaml
+            """
 
-                        // sh """
-                        //     kubectl --token=${ARGOCD_AUTH_TOKEN} \
-                        //         --server=${ARGOCD_SERVER} \
-                        //         --insecure-skip-tls-verify \
-                        //         apply -f - <<EOF
-                        // apiVersion: argoproj.io/v1alpha1
-                        // kind: Repository
-                        // metadata:
-                        // name: ${REPO_NAME}
-                        // namespace: argocd
-                        // spec:
-                        // url: ${repoUrl}
-                        // type: git
-                        // EOF
-                        // """
+            sh """
+            kubectl --token=${ARGOCD_AUTH_TOKEN} \\
+                --server=${ARGOCD_SERVER} \\
+                --insecure-skip-tls-verify \\
+                apply -f argocd-repository-template.yaml
+            """
 
-                        sh """
-                            kubectl --token=${ARGOCD_AUTH_TOKEN} \\
-                                --server=${ARGOCD_SERVER} \\
-                                --insecure-skip-tls-verify \\
-                                apply -f - <<EOF
-                            apiVersion: argoproj.io/v1alpha1
-                            kind: Repository
-                            metadata:
-                            name: ${REPO_NAME}
-                            namespace: argocd
-                            spec:
-                            url: ${repoUrl}
-                            type: git
-                            EOF
-                            """
-                        
-                        // Create/Update Application
-                        // sh """
-                        //     kubectl --token=${ARGOCD_AUTH_TOKEN} \
-                        //         --server=${ARGOCD_SERVER} \
-                        //         --insecure-skip-tls-verify \
-                        //         apply -f - <<EOF
-                        //     apiVersion: argoproj.io/v1alpha1
-                        //     kind: Application
-                        //     metadata:
-                        //       name: ${appName}
-                        //       namespace: argocd
-                        //     spec:
-                        //       project: default
-                        //       source:
-                        //         repoURL: ${repoUrl}
-                        //         targetRevision: HEAD
-                        //         path: k8s
-                        //       destination:
-                        //         server: https://kubernetes.default.svc
-                        //         namespace: ${K8S_NAMESPACE}
-                        //       syncPolicy:
-                        //         automated:
-                        //           prune: true
-                        //           selfHeal: true
-                        //     EOF
-                        // """
-                    //}
-                    
-                    echo "ArgoCD Application URL: ${ARGOCD_SERVER}/applications/${appName}"
-                }
-            }
+            sh """
+            sed -i 's|\\${APP_NAME}|${appName}|g; s|\\${REPO_URL}|${repoUrl}|g; s|\\${K8S_NAMESPACE}|${K8S_NAMESPACE}|g' argocd-application-template.yaml
+            """
+
+            // Apply Application
+            sh """
+            kubectl --token=${ARGOCD_AUTH_TOKEN} \\
+                --server=${ARGOCD_SERVER} \\
+                --insecure-skip-tls-verify \\
+                apply -f argocd-application-template.yaml
+            """
+            
+            echo "ArgoCD Application URL: ${ARGOCD_SERVER}/applications/${appName}"
         }
+    }
+}
     }
 
     // post {
