@@ -9,6 +9,14 @@ pipeline {
     }
 
     stages {
+        stage('Diagnostics') {
+            steps {
+                sh 'df -h'
+                sh 'df -i'
+                sh 'docker system df -v'
+                sh 'docker info'
+            }
+        }
         stage('Checkout') {
             steps {
                 checkout scm
