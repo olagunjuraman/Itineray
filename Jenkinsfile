@@ -33,11 +33,24 @@ pipeline {
                 }
             }
         }
+        stage('Clean Local Docker Image') {
+            steps {
+                sh "docker rmi ${DOCKER_IMAGE}"
+            }
+        }
     }
 
-    // post {
-    //     always {
-    //         sh "gcloud auth revoke --all"
-    //     }
-    // }
+    post {
+        always {
+            cleanWs()
+            sh "gcloud auth revoke --all"
+        }
+        success {
+            echo "Successfully built and pushed image: ${DOCKER_IMAGE}"
+        }
+        failure {
+            echo "Failed to build/push image: ${DOCKER_IMAGE}"
+        }
+    }
+
 }
