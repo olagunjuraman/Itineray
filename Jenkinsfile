@@ -169,7 +169,12 @@ pipeline {
         }
 
         stage('Build and Push Docker Image') {
-            agent any  // Run on Jenkins agent to use Docker daemon
+     
+            docker {
+            image 'docker:dind'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+            }
+        
             steps {
                 script {
                     def fullImageName = "${GCR_REGION}.gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
