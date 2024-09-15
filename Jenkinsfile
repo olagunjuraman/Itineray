@@ -115,7 +115,7 @@
 
 
 pipeline {
-    agent none  // We'll specify agents for each stage
+     agent { label 'docker' }
 
     environment {
         GCP_PROJECT_ID = 'your-gcp-project-id'
