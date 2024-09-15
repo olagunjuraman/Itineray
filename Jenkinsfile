@@ -36,9 +36,9 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            sh "gcloud auth revoke --all"
-        }
-    }
+    // post {
+    //     always {
+    //         sh "gcloud auth revoke --all"
+    //     }
+    // }
 }
