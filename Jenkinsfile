@@ -242,7 +242,7 @@ pipeline {
                         sed -i 's|image: .*|image: ${DOCKER_IMAGE}|' k8s/deployment.yml
                         git add k8s/deployment.yml
                         git commit -m 'Update image to ${DOCKER_IMAGE}' || true
-                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/itineray.git HEAD:main
+                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/itineray.git HEAD:refs/heads/main
                     """
                 }
             }
