@@ -197,7 +197,7 @@ pipeline {
             sh """
                 gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
                 gcloud container clusters get-credentials  cluster-1 --zone us-central1 --project ${GCP_PROJECT_ID}
-                kubectl --dry-run=client -f kubernetes/ apply
+                kubectl --dry-run=client -f k8s/ apply
             """
         }
     }
