@@ -52,7 +52,13 @@ pipeline {
         //         sh 'npm run build'
         //     }
         // }
-
+        stage('Docker Info') {
+    steps {
+        sh 'id'
+        sh 'groups'
+        sh 'docker info'
+    }
+}
         stage('Build and Push Docker Image') {
             steps {
                 script {
