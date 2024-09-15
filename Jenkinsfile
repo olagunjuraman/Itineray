@@ -174,7 +174,7 @@ pipeline {
         ARGOCD_SERVER  = 'https://34.31.37.25'
         REPO_NAME      = 'itinerary'
         ARGOCD_AUTH_TOKEN = '9GP0RGAN0A4QQFCi'
-        KUBECONFIG = credentials('k8s-config')
+        // KUBECONFIG = credentials('k8s-config')
     }
 
     stages {
