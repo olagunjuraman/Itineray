@@ -244,7 +244,7 @@ pipeline {
       stage('Create ArgoCD Repository and Application') {
     steps {
         script {
-            def repoUrl = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
+            def repoUrl = "https://github.com/olagunjuraman/itineray"
             def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
             
             sh """
