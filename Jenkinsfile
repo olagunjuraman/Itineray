@@ -272,21 +272,37 @@ pipeline {
                         //     EOF
                         // """
 
+                        // sh """
+                        //     kubectl --token=${ARGOCD_AUTH_TOKEN} \
+                        //         --server=${ARGOCD_SERVER} \
+                        //         --insecure-skip-tls-verify \
+                        //         apply -f - <<EOF
+                        // apiVersion: argoproj.io/v1alpha1
+                        // kind: Repository
+                        // metadata:
+                        // name: ${REPO_NAME}
+                        // namespace: argocd
+                        // spec:
+                        // url: ${repoUrl}
+                        // type: git
+                        // EOF
+                        // """
+
                         sh """
-                            kubectl --token=${ARGOCD_AUTH_TOKEN} \
-                                --server=${ARGOCD_SERVER} \
-                                --insecure-skip-tls-verify \
+                            kubectl --token=${ARGOCD_AUTH_TOKEN} \\
+                                --server=${ARGOCD_SERVER} \\
+                                --insecure-skip-tls-verify \\
                                 apply -f - <<EOF
-                        apiVersion: argoproj.io/v1alpha1
-                        kind: Repository
-                        metadata:
-                        name: ${REPO_NAME}
-                        namespace: argocd
-                        spec:
-                        url: ${repoUrl}
-                        type: git
-                        EOF
-                        """
+                            apiVersion: argoproj.io/v1alpha1
+                            kind: Repository
+                            metadata:
+                            name: ${REPO_NAME}
+                            namespace: argocd
+                            spec:
+                            url: ${repoUrl}
+                            type: git
+                            EOF
+                            """
                         
                         // Create/Update Application
                         // sh """
