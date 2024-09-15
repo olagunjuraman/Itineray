@@ -6,6 +6,7 @@ pipeline {
         IMAGE_NAME     = 'itinerary'
         IMAGE_TAG      = "${env.BUILD_NUMBER}" 
         GCP_KEY        = credentials('gcr-json-key')
+        DOCKER_IMAGE   = "gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
     }
 
     stages {
