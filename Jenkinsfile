@@ -288,7 +288,7 @@ pipeline {
                               source:
                                 repoURL: ${repoUrl}
                                 targetRevision: HEAD
-                                path: kubernetes
+                                path: k8s
                               destination:
                                 server: https://kubernetes.default.svc
                                 namespace: ${K8S_NAMESPACE}
