@@ -184,13 +184,6 @@ pipeline {
             }
         }
 
-        // stage('Validate Kubernetes Manifests') {
-        //     steps {
-        //         sh 'kubectl --dry-run=client -f k8s/ apply'
-        //     }
-        // }
-
-
         stage('Validate Kubernetes Manifests') {
     steps {
         withCredentials([file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE')]) {
@@ -255,18 +248,18 @@ pipeline {
             def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
             
             sh """
-            sed -i 's|\\${REPO_NAME}|${REPO_NAME}|g; s|\\${REPO_URL}|${repoUrl}|g' argocd-repository-template.yaml
+            sed -i 's|\\${REPO_NAME}|${REPO_NAME}|g; s|\\${REPO_URL}|${repoUrl}|g' argocd-repository-template.yml
             """
 
             sh """
             kubectl --token=${ARGOCD_AUTH_TOKEN} \\
                 --server=${ARGOCD_SERVER} \\
                 --insecure-skip-tls-verify \\
-                apply -f argocd-repository-template.yaml
+                apply -f argocd-repository-template.yml
             """
 
             sh """
-            sed -i 's|\\${APP_NAME}|${appName}|g; s|\\${REPO_URL}|${repoUrl}|g; s|\\${K8S_NAMESPACE}|${K8S_NAMESPACE}|g' argocd-application-template.yaml
+            sed -i 's|\\${APP_NAME}|${appName}|g; s|\\${REPO_URL}|${repoUrl}|g; s|\\${K8S_NAMESPACE}|${K8S_NAMESPACE}|g' argocd-application-template.yml
             """
 
             // Apply Application
@@ -274,7 +267,7 @@ pipeline {
             kubectl --token=${ARGOCD_AUTH_TOKEN} \\
                 --server=${ARGOCD_SERVER} \\
                 --insecure-skip-tls-verify \\
-                apply -f argocd-application-template.yaml
+                apply -f argocd-application-template.yml
             """
             
             echo "ArgoCD Application URL: ${ARGOCD_SERVER}/applications/${appName}"
@@ -283,17 +276,5 @@ pipeline {
 }
     }
 
-    // post {
-    //     always {
-    //         cleanWs()
-    //         sh "gcloud auth revoke --all || true"
-    //         sh "docker rmi ${DOCKER_IMAGE} || true"
-    //     }
-    //     success {
-    //         echo "Successfully built, pushed, and set up ArgoCD deployment for: ${DOCKER_IMAGE}"
-    //     }
-    //     failure {
-    //         echo "Failed in build/push/ArgoCD setup of: ${DOCKER_IMAGE}"
-    //     }
-    // }
+   
 }
