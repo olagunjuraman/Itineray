@@ -185,7 +185,7 @@ pipeline {
 
         stage('Validate Kubernetes Manifests') {
             steps {
-                sh 'kubectl --dry-run=client -f kubernetes/ apply'
+                sh 'kubectl --dry-run=client -f k8s/ apply'
             }
         }
 
@@ -208,10 +208,10 @@ pipeline {
         stage('Update Kubernetes Manifests') {
             steps {
                 sh """
-                    sed -i 's|image: .*|image: ${DOCKER_IMAGE}|' kubernetes/deployment.yaml
+                    sed -i 's|image: .*|image: ${DOCKER_IMAGE}|' k8s/deployment.yml
                     git config user.email 'jenkins@example.com'
                     git config user.name 'Jenkins'
-                    git add kubernetes/deployment.yaml
+                    git add kubernetes/deployment.yml
                     git commit -m 'Update image to ${DOCKER_IMAGE}' || true
                     git push origin HEAD:main
                 """
