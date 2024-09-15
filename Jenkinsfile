@@ -174,6 +174,7 @@ pipeline {
         ARGOCD_SERVER  = 'https://34.31.37.25'
         REPO_NAME      = 'itinerary'
         ARGOCD_AUTH_TOKEN = '9GP0RGAN0A4QQFCi'
+        KUBECONFIG = credentials('k8s-config')
     }
 
     stages {
@@ -183,11 +184,24 @@ pipeline {
             }
         }
 
+        // stage('Validate Kubernetes Manifests') {
+        //     steps {
+        //         sh 'kubectl --dry-run=client -f k8s/ apply'
+        //     }
+        // }
+
+
         stage('Validate Kubernetes Manifests') {
-            steps {
-                sh 'kubectl --dry-run=client -f k8s/ apply'
-            }
+    steps {
+        withCredentials([file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE')]) {
+            sh """
+                gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
+                gcloud container clusters get-credentials  cluster-1 --zone us-central1 --project ${GCP_PROJECT_ID}
+                kubectl --dry-run=client -f kubernetes/ apply
+            """
         }
+    }
+    }
 
         stage('Build and Push Docker Image') {
             steps {
