@@ -196,7 +196,7 @@ pipeline {
         withCredentials([file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE')]) {
             sh """
                 gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
-                gcloud container clusters get-credentials  cluster-1 --zone us-central1 --project ${GCP_PROJECT_ID}
+                gcloud container clusters get-credentials  cluster-1 --zone us-central1-c --project ${GCP_PROJECT_ID}
                 kubectl --dry-run=client -f k8s/ apply
             """
         }
