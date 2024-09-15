@@ -57,7 +57,7 @@ pipeline {
 
     environment {
         GCP_PROJECT_ID = 'concierge-miami'
-        GCR_REGION     = 'us-central1' 
+        GCR_REGION     = 'us' 
         IMAGE_NAME     = 'itinerary' 
         IMAGE_TAG      = "${env.BUILD_NUMBER}" 
     }
