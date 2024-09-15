@@ -19,7 +19,7 @@ pipeline {
             agent {
                 docker {
                     image 'python:3.9-slim'
-                    args '--rm'  // Automatically remove the container when it exits
+                    args '--rm -u root'
                 }
             }
             steps {
