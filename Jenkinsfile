@@ -67,11 +67,11 @@ pipeline {
                     docker.build(fullImageName)
                     
                     withCredentials([file(credentialsId: 'gcr-json-key', variable: 'GCR_KEY_FILE')]) {
-                        sh """
+                        sh '''
                             gcloud auth activate-service-account --key-file=${GCR_KEY_FILE}
                             gcloud auth configure-docker ${GCR_REGION}.gcr.io -q
                             docker push ${fullImageName}
-                        """
+                        '''
                     }
                     
                     echo "Built and pushed Docker image: ${fullImageName}"
