@@ -171,7 +171,7 @@ pipeline {
         IMAGE_TAG      = "${env.BUILD_NUMBER}"
         DOCKER_IMAGE   = "gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
         K8S_NAMESPACE  = 'dev'
-        ARGOCD_SERVER  = 'https://34.31.37.25'
+        ARGOCD_SERVER  = 'http://34.31.37.25'
         REPO_NAME      = 'itinerary'
         ARGOCD_AUTH_TOKEN = '9GP0RGAN0A4QQFCi'
         // KUBECONFIG = credentials('k8s-config')
