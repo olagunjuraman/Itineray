@@ -2,9 +2,9 @@ pipeline {
     agent { label 'docker' }
 
     environment {
-        GCP_PROJECT_ID = 'your-gcp-project-id'
-        GCR_REGION     = 'us' 
-        IMAGE_NAME     = 'your-image-name' 
+        GCP_PROJECT_ID = 'concierge-miami'
+        GCR_REGION     = 'us-central1' 
+        IMAGE_NAME     = 'itinerary' 
         IMAGE_TAG      = "${env.BUILD_NUMBER}" 
     }
 
