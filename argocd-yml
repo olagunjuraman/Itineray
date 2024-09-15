@@ -1,0 +1,16 @@
+server:
+  config:
+
+  ingress:
+    enabled: false
+
+configs:
+  params:
+    server.insecure: true
+
+  cm:
+
+    repositories: |
+      - url: https://github.com
+        type: git
+    server.rbac.log.enforce.enable: "false"
