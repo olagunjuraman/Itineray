@@ -14,30 +14,7 @@ pipeline {
     }
 
     stages {
-        //  stage('Set Environment') {
-        //     steps {
-        //         script {
-        //             switch(env.GIT_BRANCH) {
-        //                 case 'dev':
-        //                     env.DEPLOY_ENV = 'dev'
-        //                     env.K8S_NAMESPACE = 'dev'
-        //                     break
-        //                 case 'stage':
-        //                     env.DEPLOY_ENV = 'stage'
-        //                     env.K8S_NAMESPACE = 'stage'
-        //                     break
-        //                 case 'main':
-        //                     env.DEPLOY_ENV = 'prod'
-        //                     env.K8S_NAMESPACE = 'prod'
-        //                     break
-        //                 default:
-        //                     error("Branch ${env.GIT_BRANCH} does not have a defined deployment environment")
-        //             }
-        //             echo "Deploying to ${env.DEPLOY_ENV} environment"
-        //         }
-        //     }
-        // }
-
+      
         stage('Set Environment') {
             steps {
                 script {
@@ -111,7 +88,7 @@ pipeline {
                         sed -i 's|image: .*|image: ${DOCKER_IMAGE}|' k8s/${env.DEPLOY_ENV}/deployment.yml
                         git add k8s/${env.DEPLOY_ENV}/deployment.yml
                         git commit -m 'Update image to ${DOCKER_IMAGE}' || true
-                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/Itineray.git HEAD:refs/heads/main
+                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/Itineray.git HEAD:main
                     """
                 }
             }
