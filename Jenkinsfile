@@ -298,6 +298,7 @@ pipeline {
 
                 // Add repository to ArgoCD (if not already added)
                 sh '''
+                echo "App Name: ${appName}"
                 argocd repo add https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/itineray.git --name itinerary --type git || true
                 '''
 
