@@ -242,34 +242,72 @@ pipeline {
             }
         }
 
-      stage('Create ArgoCD Repository and Application') {
+    //   stage('Create ArgoCD Repository and Application') {
+    // steps {
+    //     script {
+    //         def repoUrl = "https://github.com/olagunjuraman/itineray"
+    //         def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
+            
+    //         sh """
+    //         sed -i 's|\\${REPO_NAME}|${REPO_NAME}|g; s|\\${REPO_URL}|${repoUrl}|g' argocd-repository-template.yml
+    //         """
+
+    //         sh """
+    //         kubectl --token=${ARGOCD_AUTH_TOKEN} \\
+    //             --server=${ARGOCD_SERVER} \\
+    //             --insecure-skip-tls-verify \\
+    //             apply -f argocd-repository-template.yml
+    //         """
+
+    //         sh """
+    //         sed -i 's|\\${APP_NAME}|${appName}|g; s|\\${REPO_URL}|${repoUrl}|g; s|\\${K8S_NAMESPACE}|${K8S_NAMESPACE}|g' argocd-application-template.yml
+    //         """
+
+    //         // Apply Application
+    //         sh """
+    //         kubectl --token=${ARGOCD_AUTH_TOKEN} \\
+    //             --server=${ARGOCD_SERVER} \\
+    //             --insecure-skip-tls-verify \\
+    //             apply -f argocd-application-template.yml
+    //         """
+            
+    //         echo "ArgoCD Application URL: ${ARGOCD_SERVER}/applications/${appName}"
+    //     }
+    // }
+    // }
+
+
+    stage('Create ArgoCD Repository and Application') {
     steps {
         script {
             def repoUrl = "https://github.com/olagunjuraman/itineray"
             def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
             
-            sh """
-            sed -i 's|\\${REPO_NAME}|${REPO_NAME}|g; s|\\${REPO_URL}|${repoUrl}|g' argocd-repository-template.yml
-            """
+            withCredentials([file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE')]) {
+                // Update Repository template
+                sh """
+                sed -i 's|\\${REPO_NAME}|${REPO_NAME}|g; s|\\${REPO_URL}|${repoUrl}|g' argocd-repository-template.yml
+                """
 
-            sh """
-            kubectl --token=${ARGOCD_AUTH_TOKEN} \\
-                --server=${ARGOCD_SERVER} \\
-                --insecure-skip-tls-verify \\
-                apply -f argocd-repository-template.yml
-            """
+                // Apply Repository
+                sh """
+                gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
+                gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project ${GCP_PROJECT_ID}
+                kubectl apply -f argocd-repository-template.yml
+                """
 
-            sh """
-            sed -i 's|\\${APP_NAME}|${appName}|g; s|\\${REPO_URL}|${repoUrl}|g; s|\\${K8S_NAMESPACE}|${K8S_NAMESPACE}|g' argocd-application-template.yml
-            """
+                // Update Application template
+                sh """
+                sed -i 's|\\${APP_NAME}|${appName}|g; s|\\${REPO_URL}|${repoUrl}|g; s|\\${K8S_NAMESPACE}|${K8S_NAMESPACE}|g' argocd-application-template.yml
+                """
 
-            // Apply Application
-            sh """
-            kubectl --token=${ARGOCD_AUTH_TOKEN} \\
-                --server=${ARGOCD_SERVER} \\
-                --insecure-skip-tls-verify \\
-                apply -f argocd-application-template.yml
-            """
+                // Apply Application
+                sh """
+                gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
+                gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project ${GCP_PROJECT_ID}
+                kubectl apply -f argocd-application-template.yml
+                """
+            }
             
             echo "ArgoCD Application URL: ${ARGOCD_SERVER}/applications/${appName}"
         }
