@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nuxt-fullstack-app
+  name: itinerary-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: nuxt-fullstack-app
+      app: itinerary-app
   template:
     metadata:
       labels:
-        app: nuxt-fullstack-app
+        app: itinerary-app
     spec:
       containers:
-      - name: nuxt-fullstack-app
+      - name: itinerary-app
         image: gcr.io/concierge-miami/itinerary:109
         ports:
         - containerPort: 3000
