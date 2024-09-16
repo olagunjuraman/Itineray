@@ -264,7 +264,7 @@ pipeline {
                 // Create ArgoCD application
                 sh '''
                 argocd app create ${APP_NAME} \
-                    --repo ${repoUrl} \
+                    --repo ${REPO_URL} \
                     --path ./k8s \
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace ${K8S_NAMESPACE} \
