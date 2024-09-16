@@ -233,14 +233,14 @@ pipeline {
         stage('Update Kubernetes Manifests') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    sh """
+                    sh '''
                         git config user.email 'jenkins@example.com'
                         git config user.name 'Jenkins'
                         sed -i 's|image: .*|image: ${DOCKER_IMAGE}|' k8s/deployment.yml
                         git add k8s/deployment.yml
                         git commit -m 'Update image to ${DOCKER_IMAGE}' || true
-                        git push https://\${GIT_USERNAME}:\${GIT_PASSWORD}@github.com/olagunjuraman/itineray.git HEAD:refs/heads/main
-                    """
+                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/itineray.git HEAD:refs/heads/main
+                    '''
                 }
             }
         }
