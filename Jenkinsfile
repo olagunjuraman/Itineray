@@ -176,6 +176,7 @@ pipeline {
         ARGOCD_AUTH_TOKEN = credentials('argocd-auth-token')
         ARGOCD_PASSWORD = credentials('argocd-password')
         REPO_URL = 'https://github.com/olagunjuraman/Itineray'
+        GIT_CREDENTIALS = credentials('github-credentials')
         // KUBECONFIG = credentials('k8s-config')
     }
 
@@ -285,6 +286,8 @@ pipeline {
                 script {
                     def repoUrl = "https://github.com/olagunjuraman/itineray"
                     def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
+                    def gitUsername = GIT_CREDENTIALS_USR
+                    def gitPassword = GIT_CREDENTIALS_PSW
                     
                     withCredentials([
                         file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE'),
@@ -300,7 +303,9 @@ pipeline {
                         sh '''
       
                         argocd login  ${ARGOCD_SERVER}  --username admin --password  ${ARGOCD_PASSWORD} --insecure
-                        argocd repo add ${repoUrl} --name ${REPO_NAME} --type git
+
+                        argocd repo add https://github.com/olagunjuraman/Itineray --name itinerary --type git --username ${gitUsername} --password ${gitPassword}
+                     
                         '''
 
                         // Create Argo CD application
