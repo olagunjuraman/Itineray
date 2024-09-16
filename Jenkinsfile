@@ -171,9 +171,9 @@ pipeline {
         IMAGE_TAG      = "${env.BUILD_NUMBER}"
         DOCKER_IMAGE   = "gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
         K8S_NAMESPACE  = 'dev'
-        ARGOCD_SERVER  = 'http://34.31.37.25'
+        ARGOCD_SERVER  = '35.188.83.107'
         REPO_NAME      = 'itinerary'
-        ARGOCD_AUTH_TOKEN = '9GP0RGAN0A4QQFCi'
+        ARGOCD_AUTH_TOKEN = credentials('argocd-auth-token')
         REPO_URL = 'https://github.com/olagunjuraman/Itineray'
         // KUBECONFIG = credentials('k8s-config')
     }
@@ -200,7 +200,8 @@ pipeline {
         stage('Build and Push Docker Image') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE')]) {
+                    withCredentials([file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE')])
+                     string(credentialsId: 'argocd-auth-token', variable: 'ARGOCD_AUTH_TOKEN') {
                         sh '''
                             gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
                             gcloud config set project ${GCP_PROJECT_ID}
@@ -277,35 +278,37 @@ pipeline {
     // }
 
 
-    stage('Create ArgoCD Repository and Application') {
+
+stage('Create ArgoCD Repository and Application') {
     steps {
         script {
             def repoUrl = "https://github.com/olagunjuraman/itineray"
             def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
             
-            withCredentials([file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE')]) {
-                // Update Repository template
-                sh """
-                sed -i 's|\\${REPO_NAME}|${REPO_NAME}|g; s|\\${REPO_URL}|${repoUrl}|g' argocd-repository-template.yml
-                """
-
-                // Apply Repository
+            withCredentials([
+                file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE'),
+                string(credentialsId: 'argocd-auth-token', variable: 'ARGOCD_AUTH_TOKEN')
+            ]) {
+                // Authenticate with GKE cluster
                 sh """
                 gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
                 gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project ${GCP_PROJECT_ID}
-                kubectl apply -f argocd-repository-template.yml
                 """
 
-                // Update Application template
+                // Add repository to Argo CD
                 sh """
-                sed -i 's|\\${APP_NAME}|${appName}|g; s|\\${REPO_URL}|${repoUrl}|g; s|\\${K8S_NAMESPACE}|${K8S_NAMESPACE}|g' argocd-application-template.yml
+                argocd login ${ARGOCD_SERVER} --auth-token ${ARGOCD_AUTH_TOKEN} --insecure
+                argocd repo add ${repoUrl} --name ${REPO_NAME} --type git
                 """
 
-                // Apply Application
+                // Create Argo CD application
                 sh """
-                gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
-                gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project ${GCP_PROJECT_ID}
-                kubectl apply -f argocd-application-template.yml
+                argocd app create ${appName} \
+                    --repo ${repoUrl} \
+                    --path . \
+                    --dest-server https://kubernetes.default.svc \
+                    --dest-namespace ${K8S_NAMESPACE} \
+                    --sync-policy automated
                 """
             }
             
@@ -313,6 +316,9 @@ pipeline {
         }
     }
 }
+
+
+
     }
 
    
