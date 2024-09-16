@@ -174,7 +174,7 @@ pipeline {
         ARGOCD_SERVER  = '35.188.83.107'
         REPO_NAME      = 'itinerary'
         ARGOCD_AUTH_TOKEN = credentials('argocd-auth-token')
-        // ARGOCD_PASSWORD = credentials('argocd-password')
+         ARGOCD_PASSWORD = credentials('argocd-password')
         REPO_URL = 'https://github.com/olagunjuraman/Itineray'
         GIT_CREDENTIALS = credentials('github-credentials')
         // KUBECONFIG = credentials('k8s-config')
@@ -360,9 +360,9 @@ stage('Create ArgoCD Repository and Application') {
                 """
 
                // Add repository to ArgoCD
-                sh """
-                argocd repo add https://${GIT_USERNAME}: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@github.com/olagunjuraman/itineray.git --name itinerary --type git
-                """
+                // sh """
+                // argocd repo add https://${GIT_USERNAME}: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@github.com/olagunjuraman/itineray.git --name itinerary --type git
+                // """
 
                 // Create ArgoCD application
                 sh """
