@@ -174,6 +174,7 @@ pipeline {
         ARGOCD_SERVER  = '35.188.83.107'
         REPO_NAME      = 'itinerary'
         ARGOCD_AUTH_TOKEN = credentials('argocd-auth-token')
+        ARGOCD_PASSWORD = credentials('argocd-password')
         REPO_URL = 'https://github.com/olagunjuraman/Itineray'
         // KUBECONFIG = credentials('k8s-config')
     }
@@ -297,7 +298,8 @@ pipeline {
 
                         // Add repository to Argo CD
                         sh '''
-                        argocd login ${ARGOCD_SERVER} --auth-token ${ARGOCD_AUTH_TOKEN} --insecure
+      
+                        argocd login  ${ARGOCD_SERVER}  --username admin --password  ${ARGOCD_PASSWORD} --insecure
                         argocd repo add ${repoUrl} --name ${REPO_NAME} --type git
                         '''
 
