@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: itinerary-app
-        image: gcr.io/concierge-miami/itinerary:117
+        image: gcr.io/concierge-miami/itinerary:118
         ports:
         - containerPort: 3000
         env:
