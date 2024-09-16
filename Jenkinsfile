@@ -14,10 +14,37 @@ pipeline {
     }
 
     stages {
-         stage('Set Environment') {
+        //  stage('Set Environment') {
+        //     steps {
+        //         script {
+        //             switch(env.GIT_BRANCH) {
+        //                 case 'dev':
+        //                     env.DEPLOY_ENV = 'dev'
+        //                     env.K8S_NAMESPACE = 'dev'
+        //                     break
+        //                 case 'stage':
+        //                     env.DEPLOY_ENV = 'stage'
+        //                     env.K8S_NAMESPACE = 'stage'
+        //                     break
+        //                 case 'main':
+        //                     env.DEPLOY_ENV = 'prod'
+        //                     env.K8S_NAMESPACE = 'prod'
+        //                     break
+        //                 default:
+        //                     error("Branch ${env.GIT_BRANCH} does not have a defined deployment environment")
+        //             }
+        //             echo "Deploying to ${env.DEPLOY_ENV} environment"
+        //         }
+        //     }
+        // }
+
+        stage('Set Environment') {
             steps {
                 script {
-                    switch(env.GIT_BRANCH) {
+                    def branchName = env.GIT_BRANCH.replaceFirst(/^origin\//, '')
+                    echo "Branch name: ${branchName}"
+                    
+                    switch(branchName) {
                         case 'dev':
                             env.DEPLOY_ENV = 'dev'
                             env.K8S_NAMESPACE = 'dev'
@@ -27,11 +54,12 @@ pipeline {
                             env.K8S_NAMESPACE = 'stage'
                             break
                         case 'main':
+                        case 'master':  // Include both main and master for flexibility
                             env.DEPLOY_ENV = 'prod'
                             env.K8S_NAMESPACE = 'prod'
                             break
                         default:
-                            error("Branch ${env.GIT_BRANCH} does not have a defined deployment environment")
+                            error("Branch ${branchName} does not have a defined deployment environment")
                     }
                     echo "Deploying to ${env.DEPLOY_ENV} environment"
                 }
