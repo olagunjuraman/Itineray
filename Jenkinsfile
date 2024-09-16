@@ -235,7 +235,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     sh """
               echo "Username: \${GIT_USERNAME}"
-                 echo "Password: \${GIT_PASSWORD:0:5}..." // Only print the first 5 characters of the password
+                 echo "Password: \${GIT_PASSWORD}" // Only print the first 5 characters of the password
         
                     // Your Git operations here
                 """
