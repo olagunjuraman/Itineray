@@ -173,8 +173,6 @@ pipeline {
         K8S_NAMESPACE  = 'dev'
         ARGOCD_SERVER  = '35.188.83.107'
         REPO_NAME      = 'itinerary'
-        // ARGOCD_AUTH_TOKEN = credentials('argocd-auth-token')
-        // ARGOCD_PASSWORD = credentials('argocd-password')
         REPO_URL = 'https://github.com/olagunjuraman/Itineray'
         GIT_CREDENTIALS = credentials('github-credentials')
         // KUBECONFIG = credentials('k8s-config')
@@ -232,7 +230,51 @@ pipeline {
             }
         }
 
-  stage('Create ArgoCD Repository and Application') {
+//   stage('Create ArgoCD Repository and Application') {
+//     steps {
+//         script {
+//             def repoUrl = "https://github.com/olagunjuraman/itineray"
+//             def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
+            
+//             withCredentials([
+//                 file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE'),
+//                 usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME'),
+//                 usernamePassword(credentialsId: 'argocd-credentials', usernameVariable: 'ARGOCD_USERNAME', passwordVariable: 'ARGOCD_PASSWORD')
+//             ]) {
+//                 // Authenticate with GKE cluster
+//                 sh '''
+//                 gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
+//                 gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project ${GCP_PROJECT_ID}
+//                 '''
+
+
+//                 sh '''
+//                 argocd login ${ARGOCD_SERVER} --username ${ARGOCD_USERNAME} --password ${ARGOCD_PASSWORD} --insecure
+//                 '''
+
+  
+//                 sh '''
+//                 argocd repo add https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/itineray.git --name itinerary --type git
+//                 '''
+
+//                 // Create ArgoCD application
+//                  sh '''
+//                 argocd app create ${appName} \
+//                     --repo ${repoUrl} \
+//                     --path ./k8s \
+//                     --dest-server https://kubernetes.default.svc \
+//                     --dest-namespace ${K8S_NAMESPACE} \
+//                     --sync-policy automated
+//                 '''
+//             }
+            
+//             echo "ArgoCD Application URL: ${ARGOCD_SERVER}/applications/${appName}"
+//         }
+//     }
+// }
+
+
+    stage('Create ArgoCD Repository and Application') {
     steps {
         script {
             def repoUrl = "https://github.com/olagunjuraman/itineray"
@@ -241,7 +283,7 @@ pipeline {
             withCredentials([
                 file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE'),
                 usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME'),
-                usernamePassword(credentialsId: 'argocd-credentials', usernameVariable: 'ARGOCD_USERNAME', passwordVariable: 'ARGOCD_PASSWORD')
+                usernamePassword(credentialsId: 'argocd-admin-credentials', usernameVariable: 'ARGOCD_ADMIN_USERNAME', passwordVariable: 'ARGOCD_ADMIN_PASSWORD')
             ]) {
                 // Authenticate with GKE cluster
                 sh '''
@@ -249,23 +291,24 @@ pipeline {
                 gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project ${GCP_PROJECT_ID}
                 '''
 
-
+                // Login to ArgoCD as admin
                 sh '''
-                argocd login ${ARGOCD_SERVER} --username ${ARGOCD_USERNAME} --password ${ARGOCD_PASSWORD} --insecure
+                argocd login ${ARGOCD_SERVER} --username ${ARGOCD_ADMIN_USERNAME} --password ${ARGOCD_ADMIN_PASSWORD} --insecure
                 '''
 
-  
+                // Add repository to ArgoCD (if not already added)
                 sh '''
-                argocd repo add https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/itineray.git --name itinerary --type git
+                argocd repo add https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/itineray.git --name itinerary --type git || true
                 '''
 
                 // Create ArgoCD application
-                 sh '''
+                sh '''
                 argocd app create ${appName} \
                     --repo ${repoUrl} \
                     --path ./k8s \
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace ${K8S_NAMESPACE} \
+                    --project default \
                     --sync-policy automated
                 '''
             }
