@@ -283,7 +283,7 @@ pipeline {
             withCredentials([
                 file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE'),
                 usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME'),
-                usernamePassword(credentialsId: 'argocd-admin-credentials', usernameVariable: 'ARGOCD_ADMIN_USERNAME', passwordVariable: 'ARGOCD_ADMIN_PASSWORD')
+                usernamePassword(credentialsId: 'argocd-credentials', usernameVariable: 'ARGOCD_USERNAME', passwordVariable: 'ARGOCD_PASSWORD')
             ]) {
                 // Authenticate with GKE cluster
                 sh '''
@@ -293,7 +293,7 @@ pipeline {
 
                 // Login to ArgoCD as admin
                 sh '''
-                argocd login ${ARGOCD_SERVER} --username ${ARGOCD_ADMIN_USERNAME} --password ${ARGOCD_ADMIN_PASSWORD} --insecure
+                argocd login ${ARGOCD_SERVER} --username ${ARGOCD_USERNAME} --password ${ARGOCD_PASSWORD} --insecure
                 '''
 
                 // Add repository to ArgoCD (if not already added)
