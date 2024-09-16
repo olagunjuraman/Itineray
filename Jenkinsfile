@@ -296,10 +296,10 @@ pipeline {
                         """
 
                         // Add repository to Argo CD
-                        sh """
+                        sh '''
                         argocd login ${ARGOCD_SERVER} --auth-token ${ARGOCD_AUTH_TOKEN} --insecure
                         argocd repo add ${repoUrl} --name ${REPO_NAME} --type git
-                        """
+                        '''
 
                         // Create Argo CD application
                         sh """
