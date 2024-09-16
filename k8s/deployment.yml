@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: nuxt-fullstack-app
-        image: gcr.io/concierge-miami/itinerary:86
+        image: gcr.io/concierge-miami/itinerary:87
         ports:
         - containerPort: 3000
         env:
