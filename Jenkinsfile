@@ -129,7 +129,8 @@ pipeline {
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace ${env.K8S_NAMESPACE} \
                     --project default \
-                    --sync-policy automated
+                    --sync-policy automated \
+                    --upsert
                 """
             }
             
