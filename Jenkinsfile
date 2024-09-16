@@ -357,12 +357,12 @@ stage('Create ArgoCD Repository and Application') {
                 // Login to ArgoCD
                 sh """
                 argocd login ${ARGOCD_SERVER} --username ${ARGOCD_USERNAME} --password ${ARGOCD_PASSWORD} --insecure
+                argocd repo add https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/itineray.git --name itinerary --type git
                 """
 
                 // Add repository to ArgoCD
-                sh """
-                argocd repo add https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/itineray.git --name itinerary --type git
-                """
+                // sh """
+                // """
 
                 // Create ArgoCD application
                 sh """
