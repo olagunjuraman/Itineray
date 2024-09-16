@@ -168,7 +168,7 @@ pipeline {
     environment {
         GCP_PROJECT_ID = 'concierge-miami'
         IMAGE_NAME     = 'itinerary'
-        APP_NAME = 'itinerary-dev'
+        // APP_NAME = 'itinerary-dev'
         IMAGE_TAG      = "${env.BUILD_NUMBER}"
         DOCKER_IMAGE   = "gcr.io/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
         K8S_NAMESPACE  = 'dev'
@@ -236,7 +236,7 @@ pipeline {
     stage('Create ArgoCD Repository and Application') {
     steps {
         script {
-            def repoUrl = "https://github.com/olagunjuraman/itineray"
+            def repoUrl = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
             def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
             
             withCredentials([
@@ -244,33 +244,30 @@ pipeline {
                 usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME'),
                 usernamePassword(credentialsId: 'argocd-credentials', usernameVariable: 'ARGOCD_USERNAME', passwordVariable: 'ARGOCD_PASSWORD')
             ]) {
-                // Authenticate with GKE cluster
+
                 sh '''
                 gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
                 gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project ${GCP_PROJECT_ID}
                 '''
 
-                // Login to ArgoCD as admin
                 sh '''
                 argocd login ${ARGOCD_SERVER} --username ${ARGOCD_USERNAME} --password ${ARGOCD_PASSWORD} --insecure
                 '''
 
-                // Add repository to ArgoCD (if not already added)
                 sh '''
                 echo "App Name: ${appName}"
                 argocd repo add https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/olagunjuraman/itineray.git --name itinerary --type git || true
                 '''
 
-                // Create ArgoCD application
-                sh '''
-                argocd app create ${APP_NAME} \
-                    --repo ${REPO_URL} \
+                sh """
+                argocd app create ${appName} \
+                    --repo ${repoUrl} \
                     --path ./k8s \
                     --dest-server https://kubernetes.default.svc \
                     --dest-namespace ${K8S_NAMESPACE} \
                     --project default \
                     --sync-policy automated
-                '''
+                """
             }
             
             echo "ArgoCD Application URL: ${ARGOCD_SERVER}/applications/${appName}"
