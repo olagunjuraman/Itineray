@@ -11,5 +11,5 @@ spec:
         type: PathPrefix
         value: /
     backendRefs:
-    - name: nuxt-fullstack-service
+    - name: itinerary-service
       port: 80

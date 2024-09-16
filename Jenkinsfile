@@ -14,6 +14,30 @@ pipeline {
     }
 
     stages {
+         stage('Set Environment') {
+            steps {
+                script {
+                    switch(env.GIT_BRANCH) {
+                        case 'dev':
+                            env.DEPLOY_ENV = 'dev'
+                            env.K8S_NAMESPACE = 'dev'
+                            break
+                        case 'stage':
+                            env.DEPLOY_ENV = 'stage'
+                            env.K8S_NAMESPACE = 'stage'
+                            break
+                        case 'main':
+                            env.DEPLOY_ENV = 'prod'
+                            env.K8S_NAMESPACE = 'prod'
+                            break
+                        default:
+                            error("Branch ${env.GIT_BRANCH} does not have a defined deployment environment")
+                    }
+                    echo "Deploying to ${env.DEPLOY_ENV} environment"
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -71,7 +95,7 @@ pipeline {
     steps {
         script {
             def repoUrl = sh(script: 'git config --get remote.origin.url', returnStdout: true).trim()
-            def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
+              def appName = "${IMAGE_NAME}-${env.DEPLOY_ENV}"
             
             withCredentials([
                 file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE'),
@@ -96,9 +120,9 @@ pipeline {
                 sh """
                 argocd app create ${appName} \
                     --repo ${repoUrl} \
-                    --path ./k8s \
+                    --path ./k8s/${env.DEPLOY_ENV} \
                     --dest-server https://kubernetes.default.svc \
-                    --dest-namespace ${K8S_NAMESPACE} \
+                    --dest-namespace ${env.K8S_NAMESPACE} \
                     --project default \
                     --sync-policy automated
                 """
