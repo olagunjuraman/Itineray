@@ -174,7 +174,7 @@ pipeline {
         ARGOCD_SERVER  = '35.188.83.107'
         REPO_NAME      = 'itinerary'
         ARGOCD_AUTH_TOKEN = credentials('argocd-auth-token')
-        ARGOCD_PASSWORD = credentials('argocd-password')
+        // ARGOCD_PASSWORD = credentials('argocd-password')
         REPO_URL = 'https://github.com/olagunjuraman/Itineray'
         GIT_CREDENTIALS = credentials('github-credentials')
         // KUBECONFIG = credentials('k8s-config')
