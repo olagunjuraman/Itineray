@@ -201,7 +201,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE')])
-                     string(credentialsId: 'argocd-auth-token', variable: 'ARGOCD_AUTH_TOKEN') {
+                     {
                         sh '''
                             gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
                             gcloud config set project ${GCP_PROJECT_ID}
@@ -279,43 +279,43 @@ pipeline {
 
 
 
-stage('Create ArgoCD Repository and Application') {
-    steps {
-        script {
-            def repoUrl = "https://github.com/olagunjuraman/itineray"
-            def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
-            
-            withCredentials([
-                file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE'),
-                string(credentialsId: 'argocd-auth-token', variable: 'ARGOCD_AUTH_TOKEN')
-            ]) {
-                // Authenticate with GKE cluster
-                sh """
-                gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
-                gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project ${GCP_PROJECT_ID}
-                """
+        stage('Create ArgoCD Repository and Application') {
+            steps {
+                script {
+                    def repoUrl = "https://github.com/olagunjuraman/itineray"
+                    def appName = "${IMAGE_NAME}-${K8S_NAMESPACE}"
+                    
+                    withCredentials([
+                        file(credentialsId: 'gcr-json-key', variable: 'GCP_KEY_FILE'),
+                        string(credentialsId: 'argocd-auth-token', variable: 'ARGOCD_AUTH_TOKEN')
+                    ]) {
+                        // Authenticate with GKE cluster
+                        sh """
+                        gcloud auth activate-service-account --key-file=${GCP_KEY_FILE}
+                        gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project ${GCP_PROJECT_ID}
+                        """
 
-                // Add repository to Argo CD
-                sh """
-                argocd login ${ARGOCD_SERVER} --auth-token ${ARGOCD_AUTH_TOKEN} --insecure
-                argocd repo add ${repoUrl} --name ${REPO_NAME} --type git
-                """
+                        // Add repository to Argo CD
+                        sh """
+                        argocd login ${ARGOCD_SERVER} --auth-token ${ARGOCD_AUTH_TOKEN} --insecure
+                        argocd repo add ${repoUrl} --name ${REPO_NAME} --type git
+                        """
 
-                // Create Argo CD application
-                sh """
-                argocd app create ${appName} \
-                    --repo ${repoUrl} \
-                    --path . \
-                    --dest-server https://kubernetes.default.svc \
-                    --dest-namespace ${K8S_NAMESPACE} \
-                    --sync-policy automated
-                """
+                        // Create Argo CD application
+                        sh """
+                        argocd app create ${appName} \
+                            --repo ${repoUrl} \
+                            --path . \
+                            --dest-server https://kubernetes.default.svc \
+                            --dest-namespace ${K8S_NAMESPACE} \
+                            --sync-policy automated
+                        """
+                    }
+                    
+                    echo "ArgoCD Application URL: ${ARGOCD_SERVER}/applications/${appName}"
+                }
             }
-            
-            echo "ArgoCD Application URL: ${ARGOCD_SERVER}/applications/${appName}"
         }
-    }
-}
 
 
 
