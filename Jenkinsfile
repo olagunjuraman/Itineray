@@ -174,7 +174,7 @@ pipeline {
         ARGOCD_SERVER  = '35.188.83.107'
         REPO_NAME      = 'itinerary'
         ARGOCD_AUTH_TOKEN = credentials('argocd-auth-token')
-         ARGOCD_PASSWORD = credentials('argocd-password')
+        ARGOCD_PASSWORD = credentials('argocd-password')
         REPO_URL = 'https://github.com/olagunjuraman/Itineray'
         GIT_CREDENTIALS = credentials('github-credentials')
         // KUBECONFIG = credentials('k8s-config')
@@ -233,6 +233,12 @@ pipeline {
         stage('Update Kubernetes Manifests') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-credentials', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                    sh """
+              echo "Username: \${GIT_USERNAME}"
+                 echo "Password: \${GIT_PASSWORD:0:5}..." // Only print the first 5 characters of the password
+        
+                    // Your Git operations here
+                """
                     sh """
                         git config user.email 'jenkins@example.com'
                         git config user.name 'Jenkins'
